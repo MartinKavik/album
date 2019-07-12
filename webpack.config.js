@@ -24,7 +24,7 @@ loadPlugins = (environment) => {
     return [
         new HtmlWebpackPlugin({
 			template: "./front/index.html",
-			favicon: "./front/assets/image/rust.png",
+			favicon: "./front/assets/image/camera.png",
             chunks: ["app"],
             hash: true
         }),
