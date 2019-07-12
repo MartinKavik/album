@@ -1,0 +1,17 @@
+[package]
+name = "album"
+version = "0.1.0"
+authors = ["TuntematonSotilas <gatobael@gmail.com>"]
+edition = "2018"
+description = "web assembly with rust"
+repository = "https://github.com/TuntematonSotilas/album"
+license= "MIT"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+seed = "0.3.7"
+wasm-bindgen = "0.2.47"
+web-sys = "0.3.24"
+futures = "0.1.28"
