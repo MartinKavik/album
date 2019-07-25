@@ -20,13 +20,14 @@ pub fn update(_msg: Msg, _model: &mut Model, _orders: &mut Orders<Msg>) {}
 pub fn view(_model: &Model) -> impl ElContainer<Msg> {
     header![class!("navbar main__navbar"),
         section![class!("navbar-section"),
-            a!["albums", attrs!{At::Href => "/albums"} ],
+            a!["Albums", class!("btn btn-link"), attrs!{At::Href => "/albums"} ],
+			a!["Pictures", class!("btn btn-link"), attrs!{At::Href => "/pictures"} ],
         ],
         section![class!("navbar-center"),
             a![img![attrs!{At::Src => "front/assets/image/camera.png"}],  attrs!{At::Href => "/"} ],
         ],
 		section![class!("navbar-section"),
-            a!["pictures", attrs!{At::Href => "/pictures"} ],
+            a!["Login", class!("btn btn-link"), attrs!{At::Href => "/login"} ],
         ]
     ]
 }

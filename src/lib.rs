@@ -11,6 +11,8 @@ mod home;
 mod pictures;
 #[path="./components/albums.rs"]
 mod albums;
+#[path="./components/login.rs"]
+mod login;
 
 ///Routes
 fn routes(url: seed::Url) -> Msg {
@@ -18,8 +20,9 @@ fn routes(url: seed::Url) -> Msg {
         return Msg::ChangePage(0)
     }
     match url.path[0].as_ref() {
-        "albums" => Msg::ChangePage(1),
-		"pictures" => Msg::ChangePage(2),
+		"login" => Msg::ChangePage(1),
+        "albums" => Msg::ChangePage(2),
+		"pictures" => Msg::ChangePage(3),
         _ => Msg::ChangePage(0)
     }
 }
@@ -30,7 +33,8 @@ struct Model {
     header: header::Model,
 	home: home::Model,
     albums: albums::Model,
-	pictures: pictures::Model
+	pictures: pictures::Model,
+	login: login::Model,
 }
 
 ///Setup a default here, for initialization later.
@@ -41,7 +45,8 @@ impl Default for Model {
             header: header::Model::default(),
             home: home::Model::default(),
             albums: albums::Model::default(),
-			pictures: pictures::Model::default()
+			pictures: pictures::Model::default(),
+			login: login::Model::default(),
         }
     }
 }
@@ -53,7 +58,8 @@ enum Msg {
     Header(header::Msg),
     Home(home::Msg),
 	Albums(albums::Msg),
-    Pictures(pictures::Msg)
+    Pictures(pictures::Msg),
+    Login(login::Msg),
 }
 
 ///How we update the model
@@ -68,14 +74,18 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
             *orders = call_update(header::update, msg, &mut model.header)
             .map_message(Msg::Header);
         },
-		 Msg::Albums(msg) => {
+		Msg::Albums(msg) => {
             *orders = call_update(albums::update, msg, &mut model.albums)
             .map_message(Msg::Albums);
         },
-		 Msg::Pictures(msg) => {
+		Msg::Pictures(msg) => {
             *orders = call_update(pictures::update, msg, &mut model.pictures)
             .map_message(Msg::Pictures);
-        }
+        },
+		Msg::Login(msg) => {
+            *orders = call_update(login::update, msg, &mut model.login)
+            .map_message(Msg::Login);
+        },
     }
 }
 
@@ -85,8 +95,9 @@ fn view(model: &Model) -> El<Msg> {
         header::view(&model.header).els().map_message(Msg::Header),
         div![
             match model.page_id {
-                1 => div![albums::view(&model.albums).els().map_message(Msg::Albums)],
-				2 => div![pictures::view(&model.pictures).els().map_message(Msg::Pictures)],
+                1 => div![login::view(&model.login).els().map_message(Msg::Login)],
+				2 => div![albums::view(&model.albums).els().map_message(Msg::Albums)],
+				3 => div![pictures::view(&model.pictures).els().map_message(Msg::Pictures)],
                 _ =>  div![home::view(&model.home).els().map_message(Msg::Home)],
             }
         ]
