@@ -1,4 +1,5 @@
 use seed::prelude::*;
+use seed::log;
 
 ///Model
 pub struct Model {
@@ -8,6 +9,7 @@ pub struct Model {
 ///Setup a default here, for initialization later.
 impl Default for Model {
     fn default() -> Self {
+		log!("model");
         Self {
 			is_logged: false
 		}
@@ -18,10 +20,15 @@ impl Default for Model {
 #[derive(Clone)]
 pub enum Msg {}
 
-pub fn update(_msg: Msg, _model: &mut Model, _orders: &mut Orders<Msg>) {}
+pub fn update(_msg: Msg, _model: &mut Model, _orders: &mut Orders<Msg>) {
+	log!("update");
+}
 
 ///View
 pub fn view(model: &Model) -> impl ElContainer<Msg> {
+
+	log!("view");
+
 	match model.is_logged {
 		true => empty![],
 		false => {
