@@ -30,6 +30,7 @@
     "webpack-dev-server": "^3.7.2"
   },
   "dependencies": {
+    "dotenv-webpack": "^1.7.0",
     "spectre.css": "^0.5.8"
   }
 }

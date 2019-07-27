@@ -104,7 +104,8 @@ fn view(model: &Model) -> El<Msg> {
 }
 
 #[wasm_bindgen]
-pub fn render() {
+pub fn render(api_url: &str) {
+	log!(api_url);
     seed::App::build(Model::default(), update, view)
         .routes(routes)
         .finish()

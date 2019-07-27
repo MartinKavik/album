@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const fs = require('fs');
+const Dotenv = require('dotenv-webpack');
 
 loadOutput = (environment) => {
     const filename = environment.production ? "scripts/[name].[hash].min.js" : "scripts/[name].js";
@@ -38,7 +39,8 @@ loadPlugins = (environment) => {
             filename: "[name].css",
             chunkFilename: "[id].css"
         }),
-        new CleanWebpackPlugin()
+		new CleanWebpackPlugin(),
+		new Dotenv()
     ];
 };
 

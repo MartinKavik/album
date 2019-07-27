@@ -22,6 +22,13 @@ https://rustwasm.github.io/wasm-pack/installer/
 npm i 
 ```
 
+## Configuration (Dotenv)
+
+Create in root folder the file `.env` containing : 
+```
+API_URL=http://your_api_url.com
+```
+
 ## Re-build Rust code
 ```Shell
 wasm-pack build
