@@ -20,9 +20,8 @@ fn routes(url: seed::Url) -> Msg {
         return Msg::ChangePage(0)
     }
     match url.path[0].as_ref() {
-		"login" => Msg::ChangePage(1),
-        "albums" => Msg::ChangePage(2),
-		"pictures" => Msg::ChangePage(3),
+        "albums" => Msg::ChangePage(1),
+		"pictures" => Msg::ChangePage(2),
         _ => Msg::ChangePage(0)
     }
 }
@@ -93,13 +92,13 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
 fn view(model: &Model) -> El<Msg> {
     div![
         header::view(&model.header).els().map_message(Msg::Header),
-        div![
+        div![class!("main__container"),
             match model.page_id {
-                1 => div![login::view(&model.login).els().map_message(Msg::Login)],
-				2 => div![albums::view(&model.albums).els().map_message(Msg::Albums)],
-				3 => div![pictures::view(&model.pictures).els().map_message(Msg::Pictures)],
+                1 => div![albums::view(&model.albums).els().map_message(Msg::Albums)],
+				2 => div![pictures::view(&model.pictures).els().map_message(Msg::Pictures)],
                 _ =>  div![home::view(&model.home).els().map_message(Msg::Home)],
-            }
+            },
+			login::view(&model.login).els().map_message(Msg::Login)
         ]
     ]
 }
