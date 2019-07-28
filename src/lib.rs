@@ -50,6 +50,21 @@ impl Default for Model {
     }
 }
 
+impl Model {
+    ///Constructor
+    pub fn new(api_url: String) -> Self {
+        let login = login::Model::new(api_url.clone());
+        Model {
+            page_id: 0,
+            header: header::Model::default(),
+            home: home::Model::default(),
+            albums: albums::Model::default(),
+			pictures: pictures::Model::default(),
+			login: login
+        }
+    }
+}
+
 ///Update
 #[derive(Clone)]
 enum Msg {
@@ -106,7 +121,8 @@ fn view(model: &Model) -> El<Msg> {
 #[wasm_bindgen]
 pub fn render(api_url: &str) {
 	log!(api_url);
-    seed::App::build(Model::default(), update, view)
+    let model = Model::new(api_url.to_string());
+    seed::App::build(model, update, view)
         .routes(routes)
         .finish()
         .run();
