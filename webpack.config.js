@@ -98,7 +98,8 @@ module.exports = environment => {
             open: true,
             overlay: { errors: true, warnings: false },
             port: 5000,
-            watchContentBase: true
+            watchContentBase: true,
+            historyApiFallback: true
         };
     }
 
