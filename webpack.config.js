@@ -55,7 +55,7 @@ module.exports = environment => {
     const entry = { 
         app: "./front/app.js", 
         css: [
-            "./front/assets/style/style.css",
+            "./front/assets/style/site.scss",
             "./node_modules/spectre.css/dist/spectre.min.css",
             "./node_modules/spectre.css/dist/spectre-icons.css"
         ],
@@ -66,11 +66,12 @@ module.exports = environment => {
 
     const module = {
         rules: [{
-            test: /\.css$/,
+            test: /.(sa|sc|c)ss$/,
             use: [
                 MiniCssExtractPlugin.loader,
-                "css-loader"
-            ]
+                'css-loader',
+                'sass-loader',
+            ],
         },
         {
             test: /\.(png|jpe?g|gif)$/,
