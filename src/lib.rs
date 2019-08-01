@@ -74,6 +74,7 @@ enum Msg {
 	Albums(albums::Msg),
     Pictures(pictures::Msg),
     Login(login::Msg),
+    Error(String),
 }
 
 ///How we update the model
@@ -97,11 +98,28 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
             .map_message(Msg::Pictures);
         },
 		Msg::Login(msg) => {
+
+            match msg {
+                login::Msg::SendMessage => (),
+                _ => ()
+
+            };
+            /*
+            *orders = call_update(update, msg, &mut model.login)
+            .map_message(Msg::Login);
+            */
             *orders = call_update(login::update, msg, &mut model.login)
             .map_message(Msg::Login);
+            
         },
+        Msg::Error(err) => log!(err)
     }
 }
+
+/*
+fn update_err(msg: Login::Msg, model: &mut Model, orders: &mut Orders<Msg>) {
+
+}*/
 
 ///View
 fn view(model: &Model) -> El<Msg> {

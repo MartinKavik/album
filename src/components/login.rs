@@ -61,6 +61,7 @@ pub enum Msg {
     },
     Email(String),
     Password(String),
+    Error(String)
 }
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
@@ -84,10 +85,12 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
         },
         Msg::OnFetchError { label, fail_reason } => {
             log!(format!("Fetch error - {} - {:#?}", label, fail_reason));
-            orders.skip();
+            orders.send_msg(Msg::Error("a".to_string()))
+                .skip();
         },
         Msg::Email(email) => model.email = email,
         Msg::Password(password) => model.password = password,
+        Msg::Error(_error) => ()
     }
 }
 
