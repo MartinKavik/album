@@ -120,7 +120,6 @@ fn view(model: &Model) -> El<Msg> {
 
 #[wasm_bindgen]
 pub fn render(api_url: &str) {
-	log!(api_url);
     let model = Model::new(api_url.to_string());
     seed::App::build(model, update, view)
         .routes(routes)

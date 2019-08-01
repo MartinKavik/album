@@ -11,6 +11,8 @@ use serde::{Serialize, Deserialize};
 pub struct Model {
 	is_logged: bool,
 	api_url: String,
+    email: String,
+    password: String,
 }
 
 #[derive(Serialize)]
@@ -30,6 +32,8 @@ impl Default for Model {
 		Self {
 			is_logged: false,
 			api_url: "".to_string(),
+            email: "".to_string(),
+            password: "".to_string(),
 		}
     }
 }
@@ -39,7 +43,9 @@ impl Model {
     pub fn new(api_url: String) -> Self {
 		Model {
 			is_logged: false,
-			api_url: api_url + "/login",
+			api_url: api_url + "login",
+            email: "".to_string(),
+            password: "".to_string(),
 		}
 	}
 }
@@ -53,12 +59,14 @@ pub enum Msg {
         label: &'static str,
         fail_reason: fetch::FailReason,
     },
+    Email(String),
+    Password(String),
 }
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
 	match msg {
         Msg::SendMessage => {
-            orders.skip().perform_cmd(send_message(model.api_url.clone()));
+            orders.skip().perform_cmd(send_message(model));
         },
         Msg::MessageSent(fetch_object) => match fetch_object.response() {
             Ok(response) => {
@@ -77,17 +85,19 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
         Msg::OnFetchError { label, fail_reason } => {
             log!(format!("Fetch error - {} - {:#?}", label, fail_reason));
             orders.skip();
-        }
+        },
+        Msg::Email(email) => model.email = email,
+        Msg::Password(password) => model.password = password,
     }
 }
 
-fn send_message(api_url: String) -> impl Future<Item = Msg, Error = Msg> {
+fn send_message(model: &mut Model) -> impl Future<Item = Msg, Error = Msg> {
     let message = RequestBody {
-        email: "test@test.com".into(),
-        password: "55-Street".into(),
+        email: model.email.clone().into(),
+        password: model.password.clone().into(),
     };
 
-    Request::new(api_url.into())
+    Request::new(model.api_url.clone().into())
         .method(Method::Post)
         .header("Content-Type", "application/json")
         .send_json(&message)
@@ -96,9 +106,6 @@ fn send_message(api_url: String) -> impl Future<Item = Msg, Error = Msg> {
 
 ///View
 pub fn view(model: &Model) -> impl ElContainer<Msg> {
-
-	log!("view");
-
 	match model.is_logged {
 		true => empty![],
 		false => {
@@ -106,11 +113,26 @@ pub fn view(model: &Model) -> impl ElContainer<Msg> {
 				div![class!("panel-body"),
 					div![class!("form-group"),
 						label!["Email",  class!("form-label"), attrs!{At::For => "email"}],
-						input![class!("form-input"), attrs!{At::Type => "text"; At::Id => "email"; At::Placeholder => "Email" }]
+						input![
+                            class!("form-input"), 
+                            attrs!{
+                                At::Value => model.email;
+                                At::Type => "text"; 
+                                At::Id => "email"; 
+                                At::Placeholder => "Email" },
+                            input_ev(Ev::Input, Msg::Email)
+                        ]
 					],
 					div![class!("form-group"),
 						label!["Password", class!("form-label"), attrs!{At::For => "password"}],
-						input![class!("form-input"), attrs!{At::Type => "password"; At::Id => "password"; At::Placeholder => "Password" }]
+						input![
+                            class!("form-input"), 
+                            attrs!{
+                                At::Value => model.password;
+                                At::Type => "password"; 
+                                At::Id => "password"; 
+                                At::Placeholder => "Password" },
+                            input_ev(Ev::Input, Msg::Password)]
 					]
 				],
 				div![class!("panel-footer"),
