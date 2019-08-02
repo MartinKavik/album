@@ -73,8 +73,7 @@ enum Msg {
     Home(home::Msg),
 	Albums(albums::Msg),
     Pictures(pictures::Msg),
-    Login(login::Msg),
-    Error(String),
+    Login(login::Msg)
 }
 
 ///How we update the model
@@ -98,21 +97,15 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
             .map_message(Msg::Pictures);
         },
 		Msg::Login(msg) => {
-
-            match msg {
-                login::Msg::SendMessage => (),
+            match msg.clone() {
+                login::Msg::Error(err) => {
+                    log!(err)
+                },
                 _ => ()
-
             };
-            /*
-            *orders = call_update(update, msg, &mut model.login)
+            *orders = call_update(login::update, msg.clone(), &mut model.login)
             .map_message(Msg::Login);
-            */
-            *orders = call_update(login::update, msg, &mut model.login)
-            .map_message(Msg::Login);
-            
-        },
-        Msg::Error(err) => log!(err)
+        }
     }
 }
 

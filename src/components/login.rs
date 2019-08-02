@@ -55,10 +55,6 @@ impl Model {
 pub enum Msg {
 	SendMessage,
     MessageSent(fetch::FetchObject<ResponseBody>),
-    OnFetchError {
-        label: &'static str,
-        fail_reason: fetch::FailReason,
-    },
     Email(String),
     Password(String),
     Error(String)
@@ -74,23 +70,14 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
                 log!(format!("Response data: {:#?}", response.data));
                 orders.skip();
             }
-            Err(fail_reason) => {
-                orders
-                    .send_msg(Msg::OnFetchError {
-                        label: "Sending message failed",
-                        fail_reason,
-                    })
+            Err(_fail_reason) => {
+                orders.send_msg(Msg::Error("Login Error".to_string()))
                     .skip();
             }
         },
-        Msg::OnFetchError { label, fail_reason } => {
-            log!(format!("Fetch error - {} - {:#?}", label, fail_reason));
-            orders.send_msg(Msg::Error("a".to_string()))
-                .skip();
-        },
         Msg::Email(email) => model.email = email,
         Msg::Password(password) => model.password = password,
-        Msg::Error(_error) => ()
+        Msg::Error(_err) => ()
     }
 }
 
