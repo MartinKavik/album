@@ -62,7 +62,7 @@ pub enum Msg {
     SaveToken(String),
 }
 
-pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
+pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 	match msg {
         Msg::SendMessage => {
             orders.skip().perform_cmd(send_message(model));
@@ -92,8 +92,7 @@ fn send_message(model: &mut Model) -> impl Future<Item = Msg, Error = Msg> {
         email: model.email.clone().into(),
         password: model.password.clone().into(),
     };
-
-    Request::new(model.api_url.clone().into())
+    Request::new(model.api_url.clone())
         .method(Method::Post)
         .header("Content-Type", "application/json")
         .send_json(&message)
@@ -101,7 +100,7 @@ fn send_message(model: &mut Model) -> impl Future<Item = Msg, Error = Msg> {
 }
 
 ///View
-pub fn view(model: &Model) -> impl ElContainer<Msg> {
+pub fn view(model: &Model) -> impl View<Msg> {
 	match model.is_logged {
 		true => empty![],
 		false => {

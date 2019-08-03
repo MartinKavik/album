@@ -18,9 +18,9 @@ impl Default for Model {
 #[derive(Clone)]
 pub enum Msg {}
 
-pub fn update(_msg: Msg, _model: &mut Model, _orders: &mut Orders<Msg>) {}
+pub fn update(_msg: Msg, _model: &mut Model, _orders: &mut impl Orders<Msg>) {}
 
 ///View
-pub fn view(model: &Model) -> impl ElContainer<Msg> {
+pub fn view(model: &Model) -> impl View<Msg> {
     span![model.test]
 }

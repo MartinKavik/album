@@ -1,8 +1,8 @@
 use seed::prelude::*;
 use seed::fetch;
-use seed::fetch::{Request, Method};
+use seed::fetch::{Request};
 use futures::Future;
-use serde::{Serialize, Deserialize};
+//use serde::{Serialize, Deserialize};
 
 ///Model
 pub struct Model {
@@ -35,25 +35,17 @@ impl Model {
 pub enum Msg {
     SetToken(String),
     FetchData,
-    DataFetched(fetch::FetchObject<Vec<u32>>),
-    OnFetchError {
-        label: &'static str,
-        fail_reason: fetch::FailReason,
-    },
+    DataFetched(fetch::FetchObject<Vec<u32>>)
 }
 
 fn fetch_data(api_url: String, token: String) -> impl Future<Item = Msg, Error = Msg> {
     log!(token);
-    /*Request::new(api_url.into())
-        //.header("token", &token) 
-        .fetch_json(Msg::DataFetched)*/
-    Request::new(api_url.clone().into())
-        .method(Method::Get)
+    Request::new(api_url.clone())
         .header("token", &token) 
         .fetch_json(Msg::DataFetched)
 }
 
-pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
+pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::SetToken(token) => model.token = Some(token),
         Msg::FetchData => {
@@ -68,24 +60,20 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
         Msg::DataFetched(fetch_object) => {
             match fetch_object.response() {
                 Ok(response) => log!(response.data),
-                Err(fail_reason) => {
-                    orders
+                Err(_fail_reason) => {
+                    /*orders
                         .send_msg(Msg::OnFetchError {
                             label: "Fetching repository info failed",
                             fail_reason,
                         })
-                        .skip();
+                        .skip();*/
                 }
             }
         },
-        Msg::OnFetchError { label, fail_reason } => {
-            error!(format!("Fetch error - {} - {:#?}", label, fail_reason));
-            orders.skip();
-        }
     }
 }
 
 ///View
-pub fn view(_model: &Model) -> impl ElContainer<Msg> {
+pub fn view(_model: &Model) -> impl View<Msg> {
     span!["pictures"]
 }

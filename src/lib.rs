@@ -89,59 +89,50 @@ enum Msg {
 }
 
 ///How we update the model
-fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
+fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::ChangePage(page_id) => {
             model.page_id = page_id;
              match page_id {
                  2 => {
-                     *orders = call_update(pictures::update, pictures::Msg::FetchData, &mut model.pictures)
-                        .map_message(Msg::Pictures);
+                    pictures::update(pictures::Msg::FetchData, &mut model.pictures, &mut orders.proxy(Msg::Pictures));
                  },
                  _ => ()
              };
         }
 		Msg::Home(msg) => {
-            *orders = call_update(home::update, msg, &mut model.home)
-                .map_message(Msg::Home);
+            home::update(msg, &mut model.home, &mut orders.proxy(Msg::Home));
         },
         Msg::Header(msg) => {
-            *orders = call_update(header::update, msg, &mut model.header)
-                .map_message(Msg::Header);
+            header::update(msg, &mut model.header, &mut orders.proxy(Msg::Header));
         },
 		Msg::Albums(msg) => {
-            *orders = call_update(albums::update, msg, &mut model.albums)
-                .map_message(Msg::Albums);
+            albums::update(msg, &mut model.albums, &mut orders.proxy(Msg::Albums));  
         },
 		Msg::Pictures(msg) => {
-            *orders = call_update(pictures::update, msg, &mut model.pictures)
-                .map_message(Msg::Pictures);
+            pictures::update(msg, &mut model.pictures, &mut orders.proxy(Msg::Pictures));
         },
 		Msg::Login(msg) => {
             match msg.clone() {
                 login::Msg::Toast(toast) => {
-                    call_update(ctoast::update, ctoast::Msg::Show(toast), &mut model.ctoast)
-                        .map_message(Msg::CToast);
+                    ctoast::update(ctoast::Msg::Show(toast), &mut model.ctoast, &mut orders.proxy(Msg::CToast));
                 },
                 login::Msg::SaveToken(token) => {
                     model.token = Some(token.clone());
-                    call_update(pictures::update, pictures::Msg::SetToken(token.clone()), &mut model.pictures)
-                        .map_message(Msg::Pictures);
+                    pictures::update(pictures::Msg::SetToken(token.clone()), &mut model.pictures, &mut orders.proxy(Msg::Pictures));
                 }
                 _ => ()
             };
-            *orders = call_update(login::update, msg.clone(), &mut model.login)
-                .map_message(Msg::Login);
+            login::update(msg, &mut model.login, &mut orders.proxy(Msg::Login));
         },
         Msg::CToast(msg) => {
-            *orders = call_update(ctoast::update, msg, &mut model.ctoast)
-                .map_message(Msg::CToast);
+            ctoast::update(msg, &mut model.ctoast, &mut orders.proxy(Msg::CToast));
         }
     }
 }
 
 ///View
-fn view(model: &Model) -> El<Msg> {
+fn view(model: &Model) -> impl View<Msg> {
     div![
         ctoast::view(&model.ctoast).els().map_message(Msg::CToast),
         header::view(&model.header).els().map_message(Msg::Header),
@@ -163,7 +154,7 @@ fn view(model: &Model) -> El<Msg> {
 #[wasm_bindgen]
 pub fn render(api_url: &str) {
     let model = Model::new(api_url.to_string());
-    seed::App::build(model, update, view)
+    seed::App::build(|_, _| model, update, view)
         .routes(routes)
         .finish()
         .run();

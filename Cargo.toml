@@ -11,7 +11,7 @@ license= "MIT"
 crate-type = ["cdylib"]
 
 [dependencies]
-seed = "0.3.7"
+seed = "0.4"
 wasm-bindgen = "0.2.47"
 futures = "0.1.28"
 serde = "1.0.98"

@@ -27,7 +27,7 @@ pub enum Msg {
     Hide
 }
 
-pub fn update(msg: Msg, model: &mut Model, _orders: &mut Orders<Msg>) {
+pub fn update(msg: Msg, model: &mut Model, _orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::Show(toast) => {
             model.is_visible = true;
@@ -39,7 +39,7 @@ pub fn update(msg: Msg, model: &mut Model, _orders: &mut Orders<Msg>) {
 }
 
 ///View
-pub fn view(model: &Model) -> impl ElContainer<Msg> {
+pub fn view(model: &Model) -> impl View<Msg> {
     let display = match model.is_visible {
         true => "ctoast__toast--visible",
         false => "ctoast__toast--hidden"
