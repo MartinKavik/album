@@ -33,6 +33,7 @@ fn routes(url: seed::Url) -> Msg {
 ///Model
 struct Model {
     page_id: u32,
+    token: Option<String>,
     header: header::Model,
 	home: home::Model,
     albums: albums::Model,
@@ -46,6 +47,7 @@ impl Default for Model {
     fn default() -> Self {
         Self {
             page_id: 0,
+            token: None,
             header: header::Model::default(),
             home: home::Model::default(),
             albums: albums::Model::default(),
@@ -62,6 +64,7 @@ impl Model {
         let login = login::Model::new(api_url.clone());
         Model {
             page_id: 0,
+            token: None,
             header: header::Model::default(),
             home: home::Model::default(),
             albums: albums::Model::default(),
@@ -110,6 +113,7 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
                     call_update(ctoast::update, ctoast::Msg::Show(toast), &mut model.ctoast)
                         .map_message(Msg::CToast);
                 },
+                login::Msg::SaveToken(token) => model.token = Some(token),
                 _ => ()
             };
             *orders = call_update(login::update, msg.clone(), &mut model.login)
@@ -128,12 +132,16 @@ fn view(model: &Model) -> El<Msg> {
         ctoast::view(&model.ctoast).els().map_message(Msg::CToast),
         header::view(&model.header).els().map_message(Msg::Header),
         div![class!("main__container"),
-            match model.page_id {
-                1 => div![albums::view(&model.albums).els().map_message(Msg::Albums)],
-				2 => div![pictures::view(&model.pictures).els().map_message(Msg::Pictures)],
-                _ =>  div![home::view(&model.home).els().map_message(Msg::Home)],
-            },
-			login::view(&model.login).els().map_message(Msg::Login)
+            match model.token.clone() {
+                Some(_token) => {
+                    match model.page_id {
+                        1 => div![albums::view(&model.albums).els().map_message(Msg::Albums)],
+                        2 => div![pictures::view(&model.pictures).els().map_message(Msg::Pictures)],
+                        _ =>  div![home::view(&model.home).els().map_message(Msg::Home)],
+                    }
+                },
+                None => div![login::view(&model.login).els().map_message(Msg::Login)]
+            }
         ]
     ]
 }

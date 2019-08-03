@@ -1,7 +1,6 @@
 #![allow(private_in_public)]
 
 use seed::prelude::*;
-use seed::log;
 use seed::fetch;
 use seed::fetch::{Request, Method};
 use futures::Future;
@@ -14,7 +13,7 @@ pub struct Model {
 	is_logged: bool,
 	api_url: String,
     email: String,
-    password: String,
+    password: String
 }
 
 #[derive(Serialize)]
@@ -35,7 +34,7 @@ impl Default for Model {
 			is_logged: false,
 			api_url: "".to_string(),
             email: "".to_string(),
-            password: "".to_string(),
+            password: "".to_string()
 		}
     }
 }
@@ -47,7 +46,7 @@ impl Model {
 			is_logged: false,
 			api_url: api_url + "login",
             email: "".to_string(),
-            password: "".to_string(),
+            password: "".to_string()
 		}
 	}
 }
@@ -59,7 +58,8 @@ pub enum Msg {
     MessageSent(fetch::FetchObject<ResponseBody>),
     Email(String),
     Password(String),
-    Toast(toast::Toast)
+    Toast(toast::Toast),
+    SaveToken(String),
 }
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
@@ -69,8 +69,7 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
         },
         Msg::MessageSent(fetch_object) => match fetch_object.response() {
             Ok(response) => {
-                log!(format!("Response data: {:#?}", response.data));
-                orders.skip();
+                orders.send_msg(Msg::SaveToken(response.data.token)).skip();
             }
             Err(_fail_reason) => {
                 let toast = toast::Toast { 
@@ -83,7 +82,8 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
         },
         Msg::Email(email) => model.email = email,
         Msg::Password(password) => model.password = password,
-        Msg::Toast(_toast) => ()
+        Msg::Toast(_toast) => (),
+        Msg::SaveToken(_token) => ()
     }
 }
 
