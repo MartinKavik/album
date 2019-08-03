@@ -62,13 +62,14 @@ impl Model {
     ///Constructor
     pub fn new(api_url: String) -> Self {
         let login = login::Model::new(api_url.clone());
+        let pictures = pictures::Model::new(api_url.clone());
         Model {
             page_id: 0,
             token: None,
             header: header::Model::default(),
             home: home::Model::default(),
             albums: albums::Model::default(),
-			pictures: pictures::Model::default(),
+			pictures: pictures,
 			login: login,
             ctoast: ctoast::Model::default()
         }
@@ -90,22 +91,31 @@ enum Msg {
 ///How we update the model
 fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
     match msg {
-        Msg::ChangePage(page_id) => model.page_id = page_id,
+        Msg::ChangePage(page_id) => {
+            model.page_id = page_id;
+             match page_id {
+                 2 => {
+                     *orders = call_update(pictures::update, pictures::Msg::FetchData, &mut model.pictures)
+                        .map_message(Msg::Pictures);
+                 },
+                 _ => ()
+             };
+        }
 		Msg::Home(msg) => {
             *orders = call_update(home::update, msg, &mut model.home)
-            .map_message(Msg::Home);
+                .map_message(Msg::Home);
         },
         Msg::Header(msg) => {
             *orders = call_update(header::update, msg, &mut model.header)
-            .map_message(Msg::Header);
+                .map_message(Msg::Header);
         },
 		Msg::Albums(msg) => {
             *orders = call_update(albums::update, msg, &mut model.albums)
-            .map_message(Msg::Albums);
+                .map_message(Msg::Albums);
         },
 		Msg::Pictures(msg) => {
             *orders = call_update(pictures::update, msg, &mut model.pictures)
-            .map_message(Msg::Pictures);
+                .map_message(Msg::Pictures);
         },
 		Msg::Login(msg) => {
             match msg.clone() {
@@ -113,15 +123,19 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
                     call_update(ctoast::update, ctoast::Msg::Show(toast), &mut model.ctoast)
                         .map_message(Msg::CToast);
                 },
-                login::Msg::SaveToken(token) => model.token = Some(token),
+                login::Msg::SaveToken(token) => {
+                    model.token = Some(token.clone());
+                    call_update(pictures::update, pictures::Msg::SetToken(token.clone()), &mut model.pictures)
+                        .map_message(Msg::Pictures);
+                }
                 _ => ()
             };
             *orders = call_update(login::update, msg.clone(), &mut model.login)
-            .map_message(Msg::Login);
+                .map_message(Msg::Login);
         },
         Msg::CToast(msg) => {
             *orders = call_update(ctoast::update, msg, &mut model.ctoast)
-            .map_message(Msg::CToast);
+                .map_message(Msg::CToast);
         }
     }
 }
