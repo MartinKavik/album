@@ -109,11 +109,6 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
     }
 }
 
-/*
-fn update_err(msg: Login::Msg, model: &mut Model, orders: &mut Orders<Msg>) {
-
-}*/
-
 ///View
 fn view(model: &Model) -> El<Msg> {
     div![
