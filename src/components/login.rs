@@ -7,6 +7,8 @@ use seed::fetch::{Request, Method};
 use futures::Future;
 use serde::{Serialize, Deserialize};
 
+use crate::toast;
+
 ///Model
 pub struct Model {
 	is_logged: bool,
@@ -57,7 +59,7 @@ pub enum Msg {
     MessageSent(fetch::FetchObject<ResponseBody>),
     Email(String),
     Password(String),
-    Error(String)
+    Toast(toast::Toast)
 }
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
@@ -71,13 +73,17 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
                 orders.skip();
             }
             Err(_fail_reason) => {
-                orders.send_msg(Msg::Error("Login Error".to_string()))
+                let toast = toast::Toast { 
+                    is_error: true, 
+                    msg: "Login error".to_string()
+                };
+                orders.send_msg(Msg::Toast(toast))
                     .skip();
             }
         },
         Msg::Email(email) => model.email = email,
         Msg::Password(password) => model.password = password,
-        Msg::Error(_err) => ()
+        Msg::Toast(_toast) => ()
     }
 }
 

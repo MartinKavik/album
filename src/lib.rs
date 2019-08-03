@@ -13,6 +13,10 @@ mod pictures;
 mod albums;
 #[path="./components/login.rs"]
 mod login;
+#[path="./model/toast.rs"]
+pub mod toast;
+#[path="./components/ctoast.rs"]
+pub mod ctoast;
 
 ///Routes
 fn routes(url: seed::Url) -> Msg {
@@ -34,6 +38,7 @@ struct Model {
     albums: albums::Model,
 	pictures: pictures::Model,
 	login: login::Model,
+    ctoast: ctoast::Model,
 }
 
 ///Setup a default here, for initialization later.
@@ -46,6 +51,7 @@ impl Default for Model {
             albums: albums::Model::default(),
 			pictures: pictures::Model::default(),
 			login: login::Model::default(),
+            ctoast: ctoast::Model::default(),
         }
     }
 }
@@ -60,7 +66,8 @@ impl Model {
             home: home::Model::default(),
             albums: albums::Model::default(),
 			pictures: pictures::Model::default(),
-			login: login
+			login: login,
+            ctoast: ctoast::Model::default()
         }
     }
 }
@@ -73,7 +80,8 @@ enum Msg {
     Home(home::Msg),
 	Albums(albums::Msg),
     Pictures(pictures::Msg),
-    Login(login::Msg)
+    Login(login::Msg),
+    CToast(ctoast::Msg)
 }
 
 ///How we update the model
@@ -98,13 +106,22 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
         },
 		Msg::Login(msg) => {
             match msg.clone() {
-                login::Msg::Error(err) => {
-                    log!(err)
+                login::Msg::Toast(toast) => {
+
+                    //orders.send_msg(Msg::CToast(msg.clone()))
+                    //ctoast::Msg::Show(toast);
+                    /*log!(toast.msg);
+                    call_update(ctoast::update, msg.clone(), &mut model.ctoast)
+                        .map_message(Msg::CToast);*/
                 },
                 _ => ()
             };
             *orders = call_update(login::update, msg.clone(), &mut model.login)
             .map_message(Msg::Login);
+        },
+        Msg::CToast(msg) => {
+            *orders = call_update(ctoast::update, msg, &mut model.ctoast)
+            .map_message(Msg::CToast);
         }
     }
 }
@@ -112,6 +129,7 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
 ///View
 fn view(model: &Model) -> El<Msg> {
     div![
+        ctoast::view(&model.ctoast).els().map_message(Msg::CToast),
         header::view(&model.header).els().map_message(Msg::Header),
         div![class!("main__container"),
             match model.page_id {
