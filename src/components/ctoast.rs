@@ -24,7 +24,7 @@ impl Default for Model {
 #[derive(Clone)]
 pub enum Msg {
     Show(toast::Toast),
-    Show2
+    Hide
 }
 
 pub fn update(msg: Msg, model: &mut Model, _orders: &mut Orders<Msg>) {
@@ -34,24 +34,29 @@ pub fn update(msg: Msg, model: &mut Model, _orders: &mut Orders<Msg>) {
             model.is_error = toast.is_error;
             model.msg = toast.msg;
         }
-        Msg::Show2 => log!("msg2")
+        Msg::Hide => model.is_visible = false
     }
 }
 
 ///View
 pub fn view(model: &Model) -> impl ElContainer<Msg> {
     let display = match model.is_visible {
-        true => "",
-        false => "d-none"
+        true => "ctoast__toast--visible",
+        false => "ctoast__toast--hidden"
     };
     let color = match model.is_error {
         true => "toast-error",
         false => "toast-success"
     };
-    let class = ["toast", "ctoast", display, color].join(" ");
+    let class = ["toast ctoast__toast", color, display].join(" ");
     let class_str: &str = &class;
-    span![class!(class_str),
-        model.msg,
-        button![class!("btn btn-clear float-right")]
+    div![class!("ctoast__container"),
+        span![class!(class_str),
+            model.msg,
+            button![
+                class!("btn btn-clear float-right"),
+                simple_ev(Ev::Click, Msg::Hide)
+            ]
+        ]
     ]
 }

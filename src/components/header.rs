@@ -23,7 +23,12 @@ pub fn view(_model: &Model) -> impl ElContainer<Msg> {
             a!["Albums", class!("btn btn-link"), attrs!{At::Href => "/albums"} ]
         ],
         section![class!("navbar-center"),
-            a![img![attrs!{At::Src => "front/assets/image/camera.png"}],  attrs!{At::Href => "/"} ],
+            a![class!("header__imglink"),
+                attrs!{At::Href => "/"},
+                img![class!("header__img"),
+                    attrs!{At::Src => "front/assets/image/camera.png"}
+                ] 
+            ],
         ],
 		section![class!("navbar-section"),
 			a!["Pictures", class!("btn btn-link"), attrs!{At::Href => "/pictures"} ],

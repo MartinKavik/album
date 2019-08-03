@@ -1,0 +1,25 @@
+.ctoast {
+
+    &__container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    &__toast {
+        
+        position: fixed;
+        width: auto !important;
+
+        &--visible {
+            opacity: 1;
+            transition: opacity 500ms ease-in;
+        }
+        
+        &--hidden {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 500ms ease-out;
+        }
+    }   
+}
