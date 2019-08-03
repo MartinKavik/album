@@ -107,12 +107,8 @@ fn update(msg: Msg, model: &mut Model, orders: &mut Orders<Msg>) {
 		Msg::Login(msg) => {
             match msg.clone() {
                 login::Msg::Toast(toast) => {
-
-                    //orders.send_msg(Msg::CToast(msg.clone()))
-                    //ctoast::Msg::Show(toast);
-                    /*log!(toast.msg);
-                    call_update(ctoast::update, msg.clone(), &mut model.ctoast)
-                        .map_message(Msg::CToast);*/
+                    call_update(ctoast::update, ctoast::Msg::Show(toast), &mut model.ctoast)
+                        .map_message(Msg::CToast);
                 },
                 _ => ()
             };

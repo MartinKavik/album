@@ -24,16 +24,17 @@ impl Default for Model {
 #[derive(Clone)]
 pub enum Msg {
     Show(toast::Toast),
+    Show2
 }
 
 pub fn update(msg: Msg, model: &mut Model, _orders: &mut Orders<Msg>) {
     match msg {
         Msg::Show(toast) => {
-            log!(toast.msg);
             model.is_visible = true;
             model.is_error = toast.is_error;
             model.msg = toast.msg;
         }
+        Msg::Show2 => log!("msg2")
     }
 }
 
