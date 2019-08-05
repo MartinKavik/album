@@ -2,14 +2,17 @@ use seed::prelude::*;
 use seed::fetch;
 use seed::fetch::{Request};
 use futures::Future;
-use serde::{Serialize, Deserialize};
 
 use crate::toast;
+
+#[path="./cpicture.rs"]
+mod cpicture;
 
 ///Model
 pub struct Model {
     api_url: String,
     token: Option<String>,
+    ids: Vec<u32>,
 }
 
 ///Setup a default here, for initialization later.
@@ -17,7 +20,8 @@ impl Default for Model {
     fn default() -> Self {
         Self {
             api_url: "".to_string(),
-            token: None
+            token: None,
+            ids: Vec::new(),
         }
     }
 }
@@ -27,19 +31,10 @@ impl Model {
     pub fn new(api_url: String) -> Self {
 		Model {
 			api_url: api_url + "picture",
-            token: None
+            token: None,
+            ids: Vec::new(),
 		}
 	}
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-struct Picture {
-    pub id: u32,
-    pub data: String,
-    pub model: String,
-    pub date: String,
-    pub latitude: String,
-    pub longitude: String,
 }
 
 ///Update
@@ -71,7 +66,7 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         },
         Msg::IdsFetched(fetch_object) => {
             match fetch_object.response() {
-                Ok(response) => log!(response.data),
+                Ok(response) => model.ids = response.data,
                 Err(_fail_reason) => {
                     let toast = toast::Toast { 
                         is_error: true, 
@@ -87,6 +82,9 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 }
 
 ///View
-pub fn view(_model: &Model) -> impl View<Msg> {
+pub fn view(model: &Model) -> impl View<Msg> {
     span!["pictures"]
+    /*for id in &mut model.ids {
+
+    }*/
 }
