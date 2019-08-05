@@ -95,7 +95,7 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             model.page_id = page_id;
              match page_id {
                  2 => {
-                    pictures::update(pictures::Msg::FetchData, &mut model.pictures, &mut orders.proxy(Msg::Pictures));
+                    pictures::update(pictures::Msg::FetchIds, &mut model.pictures, &mut orders.proxy(Msg::Pictures));
                  },
                  _ => ()
              };
@@ -110,6 +110,12 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             albums::update(msg, &mut model.albums, &mut orders.proxy(Msg::Albums));  
         },
 		Msg::Pictures(msg) => {
+             match msg.clone() {
+                 pictures::Msg::Toast(toast) => {
+                    ctoast::update(ctoast::Msg::Show(toast), &mut model.ctoast, &mut orders.proxy(Msg::CToast));
+                },
+                _ => ()
+             }
             pictures::update(msg, &mut model.pictures, &mut orders.proxy(Msg::Pictures));
         },
 		Msg::Login(msg) => {
@@ -120,6 +126,7 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
                 login::Msg::SaveToken(token) => {
                     model.token = Some(token.clone());
                     pictures::update(pictures::Msg::SetToken(token.clone()), &mut model.pictures, &mut orders.proxy(Msg::Pictures));
+                    orders.send_msg(Msg::ChangePage(1)).skip();
                 }
                 _ => ()
             };
