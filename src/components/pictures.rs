@@ -2,17 +2,27 @@ use seed::prelude::*;
 use seed::fetch;
 use seed::fetch::{Request};
 use futures::Future;
+use serde::{Serialize, Deserialize};
 
 use crate::toast;
 
-#[path="./cpicture.rs"]
-mod cpicture;
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+struct Picture {
+    pub id: u32,
+    pub data: String,
+    pub model: String,
+    pub date: String,
+    pub latitude: String,
+    pub longitude: String,
+}
 
 ///Model
 pub struct Model {
     api_url: String,
     token: Option<String>,
     ids: Vec<u32>,
+    pics: Vec<Picture>,
 }
 
 ///Setup a default here, for initialization later.
@@ -22,6 +32,7 @@ impl Default for Model {
             api_url: "".to_string(),
             token: None,
             ids: Vec::new(),
+            pics: Vec::new(),
         }
     }
 }
@@ -33,6 +44,7 @@ impl Model {
 			api_url: api_url + "picture",
             token: None,
             ids: Vec::new(),
+            pics: Vec::new(),
 		}
 	}
 }
@@ -43,6 +55,9 @@ pub enum Msg {
     SetToken(String),
     FetchIds,
     IdsFetched(fetch::FetchObject<Vec<u32>>),
+    LoadSomePics,
+    FetchPic,
+    PicFetched(fetch::FetchObject<Vec<Picture>>),
     Toast(toast::Toast),
 }
 
@@ -66,7 +81,10 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         },
         Msg::IdsFetched(fetch_object) => {
             match fetch_object.response() {
-                Ok(response) => model.ids = response.data,
+                Ok(response) => {
+                    model.ids = response.data;
+                    orders.send_msg(Msg::LoadSomePics);
+                }
                 Err(_fail_reason) => {
                     let toast = toast::Toast { 
                         is_error: true, 
@@ -77,14 +95,27 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
                 }
             }
         },
+        Msg::LoadSomePics => {
+            /* model.ids.iter().map(|id| 
+                orders.send_msg(Msg::LoadSomePics)
+            ); */
+        },
+        Msg::FetchPic => {
+            
+        },
+        Msg::PicFetched(fetch_object) => {
+            
+        },
         Msg::Toast(_toast) => (),
     }
 }
 
 ///View
 pub fn view(model: &Model) -> impl View<Msg> {
-    span!["pictures"]
-    /*for id in &mut model.ids {
-
-    }*/
+    div![
+        model.ids.iter().map(|id| 
+        img![
+            attrs!{At::Id => id; At::Alt => id}
+        ])
+    ]
 }
