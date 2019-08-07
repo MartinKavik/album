@@ -1,3 +1,5 @@
+#![allow(private_in_public)]
+
 use seed::prelude::*;
 use seed::fetch;
 use seed::fetch::{Request};
@@ -6,15 +8,14 @@ use serde::{Serialize, Deserialize};
 
 use crate::toast;
 
-
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct Picture {
     pub id: u32,
     pub data: String,
-    pub model: String,
+    pub model: Option<String>,
     pub date: String,
-    pub latitude: String,
-    pub longitude: String,
+    pub latitude: Option<String>,
+    pub longitude: Option<String>,
 }
 
 ///Model
@@ -56,8 +57,8 @@ pub enum Msg {
     FetchIds,
     IdsFetched(fetch::FetchObject<Vec<u32>>),
     LoadSomePics,
-    FetchPic,
-    PicFetched(fetch::FetchObject<Vec<Picture>>),
+    FetchPic(u32),
+    PicFetched(fetch::FetchObject<Picture>),
     Toast(toast::Toast),
 }
 
@@ -66,6 +67,13 @@ fn fetch_ids(api_url: String, token: String) -> impl Future<Item = Msg, Error = 
         .header("token", &token) 
         .fetch_json(Msg::IdsFetched)
 }
+
+fn fetch_pic(api_url: String, token: String, id: u32) -> impl Future<Item = Msg, Error = Msg> {
+    Request::new(api_url.clone() + "/" + &id.to_string())
+        .header("token", &token) 
+        .fetch_json(Msg::PicFetched)
+}
+
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
@@ -88,7 +96,7 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
                 Err(_fail_reason) => {
                     let toast = toast::Toast { 
                         is_error: true, 
-                        msg: "Error getting pictures".to_string()
+                        msg: "Error getting pictures ids".to_string()
                     };
                     orders.send_msg(Msg::Toast(toast))
                         .skip();
@@ -96,15 +104,34 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             }
         },
         Msg::LoadSomePics => {
-            /* model.ids.iter().map(|id| 
-                orders.send_msg(Msg::LoadSomePics)
-            ); */
+            //Only 10
+            for &id in model.ids.iter().take(10) {
+                orders.send_msg(Msg::FetchPic(id));
+            };
         },
-        Msg::FetchPic => {
-            
+        Msg::FetchPic(id) => {
+            match model.token.clone() {
+                Some(token) => {
+                    orders.skip()
+                        .perform_cmd(fetch_pic(model.api_url.clone(), token, id));
+                },
+                None => ()
+            }
         },
         Msg::PicFetched(fetch_object) => {
-            
+            match fetch_object.response() {
+                Ok(response) => {
+                    model.pics.push(response.data);
+                }
+                Err(_fail_reason) => {
+                    let toast = toast::Toast { 
+                        is_error: true, 
+                        msg: "Error getting picture".to_string()
+                    };
+                    orders.send_msg(Msg::Toast(toast))
+                        .skip();
+                }
+            }
         },
         Msg::Toast(_toast) => (),
     }
@@ -113,9 +140,14 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 ///View
 pub fn view(model: &Model) -> impl View<Msg> {
     div![
-        model.ids.iter().map(|id| 
-        img![
-            attrs!{At::Id => id; At::Alt => id}
-        ])
+        model.pics.iter().map(|pic| 
+            img![
+                attrs!{
+                    At::Id => pic.id; 
+                    At::Alt => pic.id, 
+                    At::Src => format!("data:image/png;base64,{}", &pic.data)
+                }
+            ]
+        )
     ]
 }
