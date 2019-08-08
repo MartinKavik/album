@@ -69,7 +69,7 @@ fn fetch_ids(api_url: String, token: String) -> impl Future<Item = Msg, Error = 
 }
 
 fn fetch_pic(api_url: String, token: String, id: u32) -> impl Future<Item = Msg, Error = Msg> {
-    Request::new(api_url.clone() + "/" + &id.to_string())
+    Request::new(api_url.clone() + "/" + &id.to_string() + "/thumb")
         .header("token", &token) 
         .fetch_json(Msg::PicFetched)
 }
