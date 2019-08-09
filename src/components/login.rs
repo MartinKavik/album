@@ -105,7 +105,7 @@ pub fn view(model: &Model) -> impl View<Msg> {
 		true => empty![],
 		false => {
 			div![class!("panel"),
-				div![class!("panel-body"),
+				form![class!("panel-body"),
 					div![class!("form-group"),
 						label!["Email",  class!("form-label"), attrs!{At::For => "email"}],
 						input![
