@@ -104,6 +104,7 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             }
         },
         Msg::LoadSomePics => {
+            model.pics = Vec::new();
             //Only 10
             for &id in model.ids.iter().take(10) {
                 orders.send_msg(Msg::FetchPic(id));
@@ -141,7 +142,7 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 pub fn view(model: &Model) -> impl View<Msg> {
     div![
         model.pics.iter().map(|pic| 
-            img![
+            img![class!("picture__img_"),
                 attrs!{
                     At::Id => pic.id; 
                     At::Alt => pic.id, 
