@@ -1,5 +1,4 @@
 use seed::prelude::*;
-use wasm_bindgen::*;
 
 ///Model
 pub struct Model {
