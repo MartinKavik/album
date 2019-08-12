@@ -12,13 +12,9 @@ use crate::toast;
 pub mod upload;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-struct Picture {
+struct PictureThumb {
     pub id: u32,
-    pub data: String,
-    pub model: Option<String>,
-    pub date: String,
-    pub latitude: Option<String>,
-    pub longitude: Option<String>,
+    pub thumb: String,
 }
 
 ///Model
@@ -26,7 +22,7 @@ pub struct Model {
     api_url: String,
     token: Option<String>,
     ids: Vec<u32>,
-    pics: Vec<Picture>,
+    pics: Vec<PictureThumb>,
     upload: upload::Model,
 }
 
@@ -64,7 +60,7 @@ pub enum Msg {
     IdsFetched(fetch::FetchObject<Vec<u32>>),
     LoadSomePics,
     FetchPic(u32),
-    PicFetched(fetch::FetchObject<Picture>),
+    PicFetched(fetch::FetchObject<PictureThumb>),
     Toast(toast::Toast),
     Upload(upload::Msg),
 }
@@ -157,7 +153,7 @@ pub fn view(model: &Model) -> impl View<Msg> {
                     attrs!{
                         At::Id => pic.id; 
                         At::Alt => pic.id, 
-                        At::Src => format!("data:image/png;base64,{}", &pic.data)
+                        At::Src => format!("data:image/png;base64,{}", &pic.thumb)
                     }
                 ]
             )
