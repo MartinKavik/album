@@ -8,6 +8,9 @@ use serde::{Serialize, Deserialize};
 
 use crate::toast;
 
+#[path="./upload.rs"]
+pub mod upload;
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 struct Picture {
     pub id: u32,
@@ -24,6 +27,7 @@ pub struct Model {
     token: Option<String>,
     ids: Vec<u32>,
     pics: Vec<Picture>,
+    upload: upload::Model,
 }
 
 ///Setup a default here, for initialization later.
@@ -34,6 +38,7 @@ impl Default for Model {
             token: None,
             ids: Vec::new(),
             pics: Vec::new(),
+            upload: upload::Model::default(),
         }
     }
 }
@@ -46,6 +51,7 @@ impl Model {
             token: None,
             ids: Vec::new(),
             pics: Vec::new(),
+            upload: upload::Model::default(),
 		}
 	}
 }
@@ -60,6 +66,7 @@ pub enum Msg {
     FetchPic(u32),
     PicFetched(fetch::FetchObject<Picture>),
     Toast(toast::Toast),
+    Upload(upload::Msg),
 }
 
 fn fetch_ids(api_url: String, token: String) -> impl Future<Item = Msg, Error = Msg> {
@@ -135,20 +142,28 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             }
         },
         Msg::Toast(_toast) => (),
+        Msg::Upload(msg) => {
+            upload::update(msg, &mut model.upload, &mut orders.proxy(Msg::Upload));
+        },
     }
 }
 
 ///View
 pub fn view(model: &Model) -> impl View<Msg> {
     div![
-        model.pics.iter().map(|pic| 
-            img![class!("picture__img_"),
-                attrs!{
-                    At::Id => pic.id; 
-                    At::Alt => pic.id, 
-                    At::Src => format!("data:image/png;base64,{}", &pic.data)
-                }
-            ]
-        )
+        div![
+            model.pics.iter().map(|pic| 
+                img![class!("picture__img_"),
+                    attrs!{
+                        At::Id => pic.id; 
+                        At::Alt => pic.id, 
+                        At::Src => format!("data:image/png;base64,{}", &pic.data)
+                    }
+                ]
+            )
+        ],
+        div![
+            upload::view(&model.upload).els().map_message(Msg::Upload)
+        ]
     ]
 }
