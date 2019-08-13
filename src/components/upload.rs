@@ -35,6 +35,8 @@ pub fn update(msg: Msg, _model: &mut Model, orders: &mut impl Orders<Msg>) {
 pub fn view(_model: &Model) -> impl View<Msg> {
     div![class!("panel upload__panel"),
         simple_ev(Ev::DragOver, Msg::DragOver),
-        simple_ev(Ev::Click, Msg::Drop)
+        simple_ev(Ev::Click, Msg::Drop),
+        i![class!("icon icon-upload upload__icon")],
+        span!["Upload"]
     ]
 }

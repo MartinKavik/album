@@ -1,3 +1,8 @@
-.picture__img_ {
-    margin: 0.1rem,
+.picture {
+    &__container {
+        display: flex;
+    }
+    &__img {
+        margin: 0.1rem;
+    }
 }

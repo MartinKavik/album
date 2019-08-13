@@ -147,9 +147,9 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 ///View
 pub fn view(model: &Model) -> impl View<Msg> {
     div![
-        div![
+        div![class!("picture__contanier"),
             model.pics.iter().map(|pic| 
-                img![class!("picture__img_"),
+                img![class!("picture__img"),
                     attrs!{
                         At::Id => pic.id; 
                         At::Alt => pic.id, 

@@ -1,4 +1,14 @@
-.upload__panel {
-    height: 10rem;
-    width: 10rem;
+.upload {
+    &__panel {
+        height: 6rem;
+        width: 6rem;
+        background-color: #00bdaa;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+    }
+    &__icon {
+        font-size: 1.5rem;
+    }
 }
