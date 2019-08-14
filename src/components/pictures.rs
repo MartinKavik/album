@@ -146,8 +146,8 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 
 ///View
 pub fn view(model: &Model) -> impl View<Msg> {
-    div![
-        div![class!("picture__contanier"),
+    div![class!("picture__container"),
+        div![class!("picture__list"),
             model.pics.iter().map(|pic| 
                 img![class!("picture__img"),
                     attrs!{
@@ -158,8 +158,6 @@ pub fn view(model: &Model) -> impl View<Msg> {
                 ]
             )
         ],
-        div![
-            upload::view(&model.upload).els().map_message(Msg::Upload)
-        ]
+        upload::view(&model.upload).els().map_message(Msg::Upload),
     ]
 }

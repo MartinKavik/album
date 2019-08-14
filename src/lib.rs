@@ -110,12 +110,12 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             albums::update(msg, &mut model.albums, &mut orders.proxy(Msg::Albums));  
         },
 		Msg::Pictures(msg) => {
-             match msg.clone() {
-                 pictures::Msg::Toast(toast) => {
+            match msg.clone() {
+                pictures::Msg::Toast(toast) => {
                     ctoast::update(ctoast::Msg::Show(toast), &mut model.ctoast, &mut orders.proxy(Msg::CToast));
                 },
                 _ => ()
-             }
+            }
             pictures::update(msg, &mut model.pictures, &mut orders.proxy(Msg::Pictures));
         },
 		Msg::Login(msg) => {
@@ -147,12 +147,12 @@ fn view(model: &Model) -> impl View<Msg> {
             match model.token.clone() {
                 Some(_token) => {
                     match model.page_id {
-                        1 => div![albums::view(&model.albums).els().map_message(Msg::Albums)],
-                        2 => div![pictures::view(&model.pictures).els().map_message(Msg::Pictures)],
-                        _ =>  div![home::view(&model.home).els().map_message(Msg::Home)],
+                        1 => albums::view(&model.albums).els().map_message(Msg::Albums),
+                        2 => pictures::view(&model.pictures).els().map_message(Msg::Pictures),
+                        _ => home::view(&model.home).els().map_message(Msg::Home),
                     }
                 },
-                None => div![login::view(&model.login).els().map_message(Msg::Login)]
+                None => login::view(&model.login).els().map_message(Msg::Login)
             }
         ]
     ]

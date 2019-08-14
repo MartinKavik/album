@@ -1,6 +1,11 @@
 .picture {
     &__container {
         display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+    &__list {
+        //display: flex;
     }
     &__img {
         margin: 0.1rem;

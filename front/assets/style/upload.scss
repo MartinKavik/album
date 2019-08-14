@@ -1,4 +1,9 @@
 .upload {
+    &__container {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+    }
     &__panel {
         height: 6rem;
         width: 6rem;
