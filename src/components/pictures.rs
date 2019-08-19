@@ -125,7 +125,8 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         Msg::PicFetched(fetch_object) => {
             match fetch_object.response() {
                 Ok(response) => {
-                    model.pics.push(response.data);
+                    log!("PicFetched");
+                    model.pics.push(response.data)
                 }
                 Err(_fail_reason) => {
                     let toast = toast::Toast { 
@@ -146,18 +147,26 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 
 ///View
 pub fn view(model: &Model) -> impl View<Msg> {
+    let pics = &model.pics;
+    let mut pics_iter = pics.into_iter();
     div![class!("picture__container"),
         upload::view(&model.upload).els().map_message(Msg::Upload),
         div![class!("picture__list"),
-            model.pics.iter().map(|pic| 
-                img![class!("picture__img"),
-                    attrs!{
-                        At::Id => pic.id; 
-                        At::Alt => pic.id, 
-                        At::Src => format!("data:image/png;base64,{}", &pic.thumb)
+            model.ids.iter().map(|id| {
+                let pic_res = pics_iter.find(|x| x.id.eq(id));
+                div![class!("picture__img"),
+                    match pic_res {
+                        Some(pic) => img![
+                            attrs!{
+                                At::Id => id; 
+                                At::Alt => id,
+                                At::Src => format!("data:image/png;base64,{}", &pic.thumb)
+                            }
+                        ],
+                        None => div![class!("picture__loading")]
                     }
                 ]
-            )
+            })
         ]
     ]
 }

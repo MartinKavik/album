@@ -7,11 +7,11 @@
     &__panel {
         height: 5rem;
         width: 50%;
-        background-color: #00bdaa;
+        border-color: $upload-color !important;
         display: flex;
         justify-content: center;
         align-items: center;
-        color: white;
+        color: $upload-color;
     }
     &__icon {
         font-size: 1.5rem;
