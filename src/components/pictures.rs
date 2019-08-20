@@ -17,12 +17,17 @@ struct PictureThumb {
     pub thumb: String,
 }
 
+#[derive(Debug, Clone)]
+struct PictureThumb2 {
+    pub id: u32,
+    pub thumb: Option<String>,
+}
+
 ///Model
 pub struct Model {
     api_url: String,
     token: Option<String>,
-    ids: Vec<u32>,
-    pics: Vec<PictureThumb>,
+    pics: Vec<PictureThumb2>,
     upload: upload::Model,
 }
 
@@ -32,7 +37,6 @@ impl Default for Model {
         Self {
             api_url: "".to_string(),
             token: None,
-            ids: Vec::new(),
             pics: Vec::new(),
             upload: upload::Model::default(),
         }
@@ -45,7 +49,6 @@ impl Model {
 		Model {
 			api_url: api_url + "picture",
             token: None,
-            ids: Vec::new(),
             pics: Vec::new(),
             upload: upload::Model::default(),
 		}
@@ -93,7 +96,13 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         Msg::IdsFetched(fetch_object) => {
             match fetch_object.response() {
                 Ok(response) => {
-                    model.ids = response.data;
+                    let ids = &response.data;
+                    model.pics = ids.into_iter().map(|&id | 
+                        PictureThumb2 {
+                            id: id,
+                            thumb: None
+                        }
+                    ).collect();
                     orders.send_msg(Msg::LoadSomePics);
                 }
                 Err(_fail_reason) => {
@@ -107,10 +116,10 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
             }
         },
         Msg::LoadSomePics => {
-            model.pics = Vec::new();
             //Only 20
-            for &id in model.ids.iter().take(20) {
-                orders.send_msg(Msg::FetchPic(id));
+            let pics2 = &model.pics;
+            for pic in pics2.iter().take(20) {
+                orders.send_msg(Msg::FetchPic(pic.id));
             };
         },
         Msg::FetchPic(id) => {
@@ -125,8 +134,9 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
         Msg::PicFetched(fetch_object) => {
             match fetch_object.response() {
                 Ok(response) => {
-                    log!("PicFetched");
-                    model.pics.push(response.data)
+                    let ele = model.pics.iter_mut().find(|x| x.id.eq(&response.data.id));
+                    let mut ele2 = ele.unwrap();
+                    ele2.thumb = Some(response.data.thumb);
                 }
                 Err(_fail_reason) => {
                     let toast = toast::Toast { 
@@ -147,20 +157,17 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 
 ///View
 pub fn view(model: &Model) -> impl View<Msg> {
-    let pics = &model.pics;
-    let mut pics_iter = pics.into_iter();
     div![class!("picture__container"),
         upload::view(&model.upload).els().map_message(Msg::Upload),
         div![class!("picture__list"),
-            model.ids.iter().map(|id| {
-                let pic_res = pics_iter.find(|x| x.id.eq(id));
+            model.pics.iter().map(|pic| {
                 div![class!("picture__img"),
-                    match pic_res {
-                        Some(pic) => img![
+                    match &pic.thumb {
+                        Some(thumb) => img![
                             attrs!{
-                                At::Id => id; 
-                                At::Alt => id,
-                                At::Src => format!("data:image/png;base64,{}", &pic.thumb)
+                                At::Id => pic.id; 
+                                At::Alt => pic.id,
+                                At::Src => format!("data:image/png;base64,{}", &thumb)
                             }
                         ],
                         None => div![class!("picture__loading")]
