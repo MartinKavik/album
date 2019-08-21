@@ -126,7 +126,9 @@ pub fn view(model: &Model) -> impl View<Msg> {
                                 At::Value => model.password;
                                 At::Type => "password"; 
                                 At::Id => "password"; 
-                                At::Placeholder => "Password" },
+                                At::Placeholder => "Password"
+                                At::AutoComplete => true,
+                            },
                             input_ev(Ev::Input, Msg::Password)]
 					]
 				],
