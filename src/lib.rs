@@ -93,12 +93,12 @@ fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::ChangePage(page_id) => {
             model.page_id = page_id;
-             match page_id {
-                 2 => {
+            /*match page_id {
+                2 => {
                     pictures::update(pictures::Msg::FetchIds, &mut model.pictures, &mut orders.proxy(Msg::Pictures));
-                 },
-                 _ => ()
-             };
+                },
+                _ => ()
+             };*/
         }
 		Msg::Home(msg) => {
             home::update(msg, &mut model.home, &mut orders.proxy(Msg::Home));

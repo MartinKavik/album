@@ -59,7 +59,7 @@ impl Model {
 #[derive(Clone)]
 pub enum Msg {
     SetToken(String),
-    FetchIds,
+    FetchIds(i32),
     IdsFetched(fetch::FetchObject<Vec<u32>>),
     LoadSomePics,
     FetchPic(u32),
@@ -84,7 +84,8 @@ fn fetch_pic(api_url: String, token: String, id: u32) -> impl Future<Item = Msg,
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
         Msg::SetToken(token) => model.token = Some(token),
-        Msg::FetchIds => {
+        Msg::FetchIds(nb) => {
+            log!("FetchIds {}", nb);
             match model.token.clone() {
                 Some(token) => {
                     orders.skip()
@@ -155,11 +156,20 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     }
 }
 
+fn get_height(el: &web_sys::Node) -> i32 {
+    let html_el = seed::to_html_el(&el);
+    let h = html_el.client_height();
+    log!("test {:?}", h);
+    h
+}
+
 ///View
 pub fn view(model: &Model) -> impl View<Msg> {
     div![class!("picture__container"),
         upload::view(&model.upload).els().map_message(Msg::Upload),
-        div![class!("picture__list"),
+        div![
+            class!("picture__list"),
+            simple_ev(Ev::Click, Msg::FetchIds(1)),
             model.pics.iter().map(|pic| {
                 div![class!("picture__img"),
                     match &pic.thumb {
