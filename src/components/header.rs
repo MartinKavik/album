@@ -26,7 +26,7 @@ pub fn view(_model: &Model) -> impl View<Msg> {
             a![class!("header__imglink"),
                 attrs!{At::Href => "/"},
                 img![class!("header__img"),
-                    attrs!{At::Src => "front/assets/image/camera.png"}
+                    attrs!{At::Src => "front/image/camera.png"}
                 ] 
             ],
         ],

@@ -26,7 +26,7 @@ npm i
 
 Create in root folder the file `.env` containing : 
 ```
-API_URL=http://your_api_url.com
+API_URL=http://your_api_url.com/
 ```
 
 ## Re-build Rust code

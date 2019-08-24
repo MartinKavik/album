@@ -88,7 +88,7 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
 }
 
 fn send_message(model: &mut Model) -> impl Future<Item = Msg, Error = Msg> {
-    let message = RequestBody {
+	let message = RequestBody {
         email: model.email.clone().into(),
         password: model.password.clone().into(),
     };

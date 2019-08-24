@@ -25,7 +25,7 @@ loadPlugins = (environment) => {
     return [
         new HtmlWebpackPlugin({
 			template: "./front/index.html",
-			favicon: "./front/assets/image/camera.png",
+			favicon: "./front/image/camera.png",
             chunks: ["app"],
             hash: true
         }),
@@ -45,7 +45,7 @@ loadPlugins = (environment) => {
 };
 
 getImages = () => {
-   const dir = "./front/assets/image/";
+   const dir = "./front/image/";
    return fs.readdirSync(dir).map(x => x = dir + x);
 }
 
@@ -55,7 +55,7 @@ module.exports = environment => {
     const entry = { 
         app: "./front/app.js", 
         css: [
-            "./front/assets/style/site.scss",
+            "./front/style/site.scss",
             "./node_modules/spectre.css/dist/spectre.min.css",
             "./node_modules/spectre.css/dist/spectre-icons.css"
         ],
