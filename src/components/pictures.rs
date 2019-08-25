@@ -155,13 +155,6 @@ pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     }
 }
 
-/*fn get_height(el: &web_sys::Node) -> i32 {
-    let html_el = seed::to_html_el(&el);
-    let h = html_el.client_height();
-    log!("test {:?}", h);
-    h
-}*/
-
 ///View
 pub fn view(model: &Model) -> impl View<Msg> {
     div![class!("picture__container"),

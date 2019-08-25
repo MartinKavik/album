@@ -1,13 +1,16 @@
 use seed::prelude::*;
 
 ///Model
+#[derive(Debug, Clone)]
 pub struct Model {
+	files: Option<web_sys::FileList>
 }
 
 ///Setup a default here, for initialization later.
 impl Default for Model {
     fn default() -> Self {
         Self {
+			files: None
         }
     }
 }
@@ -16,7 +19,8 @@ impl Default for Model {
 #[derive(Clone)]
 pub enum Msg {
     Drop,
-    DragOver
+    DragOver,
+	SendFiles(web_sys::Event)
 }
 
 pub fn update(msg: Msg, _model: &mut Model, orders: &mut impl Orders<Msg>) {
@@ -27,7 +31,10 @@ pub fn update(msg: Msg, _model: &mut Model, orders: &mut impl Orders<Msg>) {
         Msg::DragOver => {
             //log!("dragover {:?}", event);
             orders.skip();
-        }
+        },
+		Msg::SendFiles(event) => {
+			log!("{:?}", event);
+		}
     }
 }
 
@@ -38,7 +45,20 @@ pub fn view(_model: &Model) -> impl View<Msg> {
             simple_ev(Ev::DragOver, Msg::DragOver),
             simple_ev(Ev::Click, Msg::Drop),
             i![class!("icon icon-upload upload__icon")],
-            span!["Upload"]
+            span!["Upload"],
+			form![
+				attrs!{ 
+					At::Method => "post"
+				},
+				input![
+					attrs!{
+						At::Type => "file",
+						At::Accept => "image/png, image/jpeg",
+						At::Multiple => true
+					},
+					raw_ev(Ev::Input, Msg::SendFiles)
+				]
+			]
         ]
     ]
 }
