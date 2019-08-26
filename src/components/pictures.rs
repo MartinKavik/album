@@ -58,6 +58,7 @@ impl Model {
 ///Update
 #[derive(Clone)]
 pub enum Msg {
+    Load,
     SetToken(String),
     FetchIds,
     IdsFetched(fetch::FetchObject<Vec<u32>>),
@@ -83,6 +84,9 @@ fn fetch_pic(api_url: String, token: String, id: u32) -> impl Future<Item = Msg,
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
+        Msg::Load => {
+            log!("Load")
+        },
         Msg::SetToken(token) => model.token = Some(token),
         Msg::FetchIds => {
             match model.token.clone() {
@@ -161,6 +165,7 @@ pub fn view(model: &Model) -> impl View<Msg> {
         upload::view(&model.upload).els().map_message(Msg::Upload),
         div![
             class!("picture__list"),
+            simple_ev(Ev::Load, Msg::Load),
             model.pics.iter().map(|pic| {
                 div![class!("picture__img"),
                     match &pic.thumb {

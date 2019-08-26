@@ -1,17 +1,14 @@
 use seed::prelude::*;
+use wasm_bindgen::JsCast;
 
 ///Model
 #[derive(Debug, Clone)]
-pub struct Model {
-	files: Option<web_sys::FileList>
-}
+pub struct Model {}
 
 ///Setup a default here, for initialization later.
 impl Default for Model {
     fn default() -> Self {
-        Self {
-			files: None
-        }
+        Self {}
     }
 }
 
@@ -20,7 +17,7 @@ impl Default for Model {
 pub enum Msg {
     Drop,
     DragOver,
-	SendFiles(web_sys::Event)
+	FileChanged(Option<web_sys::FileList>)
 }
 
 pub fn update(msg: Msg, _model: &mut Model, orders: &mut impl Orders<Msg>) {
@@ -32,8 +29,23 @@ pub fn update(msg: Msg, _model: &mut Model, orders: &mut impl Orders<Msg>) {
             //log!("dragover {:?}", event);
             orders.skip();
         },
-		Msg::SendFiles(event) => {
-			log!("{:?}", event);
+		Msg::FileChanged(files_opt) => {
+            match files_opt {
+                Some(files) => {
+                    for i in 0..files.length() - 1 {
+                        let file_opt = files.get(i);
+                        match file_opt {
+                            Some(file) => {
+                                let form_data = web_sys::FormData::new().unwrap();
+                                //form_data.append_with_blob("file", file);
+                                log!("{:?}", form_data);
+                            },
+                            None => ()
+                        }
+                    }
+                },
+                None => ()
+            }
 		}
     }
 }
@@ -51,12 +63,19 @@ pub fn view(_model: &Model) -> impl View<Msg> {
 					At::Method => "post"
 				},
 				input![
+                    raw_ev(Ev::Input, |event| {
+                        let files = event
+                            .target()
+                            .and_then(|target| target.dyn_into::<web_sys::HtmlInputElement>().ok())
+                            .and_then(|file_input| file_input.files());
+                        Msg::FileChanged(files)
+                    }),
 					attrs!{
 						At::Type => "file",
 						At::Accept => "image/png, image/jpeg",
 						At::Multiple => true
 					},
-					raw_ev(Ev::Input, Msg::SendFiles)
+					
 				]
 			]
         ]
