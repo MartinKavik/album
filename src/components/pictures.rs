@@ -58,7 +58,7 @@ impl Model {
 ///Update
 #[derive(Clone)]
 pub enum Msg {
-    Load,
+    PictureLoaded(u32, i32),
     SetToken(String),
     FetchIds,
     IdsFetched(fetch::FetchObject<Vec<u32>>),
@@ -84,8 +84,8 @@ fn fetch_pic(api_url: String, token: String, id: u32) -> impl Future<Item = Msg,
 
 pub fn update(msg: Msg, model: &mut Model, orders: &mut impl Orders<Msg>) {
     match msg {
-        Msg::Load => {
-            log!("Load")
+        Msg::PictureLoaded(id, height) => {
+            log!("Picture loaded", id, height)
         },
         Msg::SetToken(token) => model.token = Some(token),
         Msg::FetchIds => {
@@ -165,17 +165,24 @@ pub fn view(model: &Model) -> impl View<Msg> {
         upload::view(&model.upload).els().map_message(Msg::Upload),
         div![
             class!("picture__list"),
-            simple_ev(Ev::Load, Msg::Load),
             model.pics.iter().map(|pic| {
                 div![class!("picture__img"),
                     match &pic.thumb {
-                        Some(thumb) => img![
-                            attrs!{
-                                At::Id => pic.id; 
-                                At::Alt => pic.id,
-                                At::Src => format!("data:image/png;base64,{}", &thumb)
-                            }
-                        ],
+                        Some(thumb) => {
+                            let pic_id = pic.id;
+                            img![
+                                attrs!{
+                                    At::Id => pic_id;
+                                    At::Alt => pic_id,
+                                    At::Src => format!("data:image/png;base64,{}", &thumb)
+                                },
+                                raw_ev(Ev::Load, move |event| {
+                                    let target = &event.target().unwrap();
+                                    let el = seed::to_html_el(target);
+                                    Msg::PictureLoaded(pic_id, el.client_height())
+                                }),
+                            ]
+                        },
                         None => div![class!("picture__loading")]
                     }
                 ]
